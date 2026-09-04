@@ -1,3 +1,4 @@
+// Required by Dreamhouse page components.
 public with sharing class FileUtilities {
     @AuraEnabled
     public static String createFile(

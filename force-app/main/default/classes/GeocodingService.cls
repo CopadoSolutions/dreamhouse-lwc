@@ -1,3 +1,4 @@
+// Required by Dreamhouse page components.
 public with sharing class GeocodingService {
     private static final String BASE_URL = 'https://nominatim.openstreetmap.org/search?format=json';
 
