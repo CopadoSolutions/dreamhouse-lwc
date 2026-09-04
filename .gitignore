@@ -43,3 +43,18 @@ $RECYCLE.BIN/
 # Local environment variables
 .env
 .agentia/config.user.json
+
+# Agentia local runtime data
+.agentia/crt-workspace/
+.agentia/idex/
+
+# Local Agentia data exports
+arm-1-data-commit-preview.json
+arm-1-data-commit-request.json
+arm-2-template-records.jsonl
+us-*-template-records.json
+us-*-data-commit-request.json
+
+# Local agent instructions
+.agents/
+agents.md
