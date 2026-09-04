@@ -100,7 +100,7 @@
         </rules>
     </decisions>
     <description
-    >This flow helps agents creating new properties in just a few clicks. It calculates the geocoded address calling out to a 3rd party service.</description>
+    >This flow helps agents create new properties in a few clicks and calculates the geocoded address using a third-party service.</description>
     <formulas>
         <description
         >Main picture URL that we&apos;ll use as thumbnail</description>

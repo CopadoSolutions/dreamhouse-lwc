@@ -1,4 +1,4 @@
-// Aura-enabled helpers for uploading files and linking them to Salesforce records.
+// Required by Dreamhouse page components.
 public with sharing class FileUtilities {
     // Creates a ContentVersion from base64 data and links it to the given record.
     @AuraEnabled
