@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Broker_Id__c</fullName>
+    <description>Broker Id used by the Dreamhouse application.</description>
     <externalId>true</externalId>
     <label>Broker Id</label>
     <precision>18</precision>
