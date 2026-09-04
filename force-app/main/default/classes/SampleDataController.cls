@@ -11,6 +11,37 @@ public with sharing class SampleDataController {
         insertContacts();
     }
 
+    @AuraEnabled(cacheable=true)
+    public static List<Product2> getProductsForOpportunity(Id opportunityId) {
+        if (opportunityId == null) {
+            return new List<Product2>();
+        }
+
+        List<Opportunity> opportunities = [
+            SELECT Preferred_Product_Family__c
+            FROM Opportunity
+            WHERE Id = :opportunityId
+            WITH USER_MODE
+            LIMIT 1
+        ];
+        if (
+            opportunities.isEmpty() ||
+            String.isBlank(opportunities[0].Preferred_Product_Family__c)
+        ) {
+            return new List<Product2>();
+        }
+
+        String preferredFamily = opportunities[0].Preferred_Product_Family__c;
+        return [
+            SELECT Id, Name, ProductCode, Family, IsActive
+            FROM Product2
+            WHERE IsActive = TRUE AND Family = :preferredFamily
+            WITH USER_MODE
+            ORDER BY Name
+            LIMIT 200
+        ];
+    }
+
     private static void insertBrokers() {
         StaticResource brokersResource = [
             SELECT Id, Body

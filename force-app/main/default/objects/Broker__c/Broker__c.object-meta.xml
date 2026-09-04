@@ -43,6 +43,8 @@
     <allowInChatterGroups>false</allowInChatterGroups>
     <compactLayoutAssignment>Broker_Compact</compactLayoutAssignment>
     <deploymentStatus>Deployed</deploymentStatus>
+    <description
+    >Stores brokers associated with Dreamhouse properties.</description>
     <enableActivities>false</enableActivities>
     <enableBulkApi>true</enableBulkApi>
     <enableFeeds>false</enableFeeds>
