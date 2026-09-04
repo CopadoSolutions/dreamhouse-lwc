@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "agentia": {
+      "args": [
+        "mcp",
+        "start"
+      ],
+      "command": "agentia",
+      "type": "stdio"
+    }
+  }
+}
