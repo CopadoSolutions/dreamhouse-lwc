@@ -1,7 +1,9 @@
+// Resolves street addresses to latitude/longitude via the OpenStreetMap Nominatim API.
 public with sharing class GeocodingService {
     //comment 
     private static final String BASE_URL = 'https://nominatim.openstreetmap.org/search?format=json';
 
+    // Invocable from Flow; returns one Coordinates entry per input address.
     @InvocableMethod(callout=true label='Geocode address')
     public static List<Coordinates> geocodeAddresses(
         List<GeocodingAddress> addresses
@@ -32,6 +34,7 @@ public with sharing class GeocodingService {
                 HttpRequest request = new HttpRequest();
                 request.setEndpoint(geocodingUrl);
                 request.setMethod('GET');
+                // Nominatim requires a referer identifying the calling org.
                 request.setHeader(
                     'http-referer',
                     URL.getOrgDomainUrl().toExternalForm()
