@@ -4,5 +4,5 @@
     fqn="PageTemplate_2_7_3"
 >
     <apiVersion>64.0</apiVersion>
-    <description>A Lightning Component Bundle</description>
+    <description>Dreamhouse three-region Lightning page template.</description>
 </AuraDefinitionBundle>
