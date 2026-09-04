@@ -4,5 +4,6 @@
     fqn="ldsUtils"
 >
     <apiVersion>64.0</apiVersion>
+    <description>ldsUtils shared component for Dreamhouse.</description>
     <isExposed>false</isExposed>
 </LightningComponentBundle>
