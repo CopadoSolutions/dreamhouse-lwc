@@ -16,108 +16,86 @@ private class TestSampleDataController {
     }
 
     @IsTest
-    static void getProductsReturnsProductsSortedByName() {
-        System.runAs(new User(Id = UserInfo.getUserId())) {
-            insertProducts();
+    static void getProductsForOpportunityReturnsActivePreferredProducts() {
+        User recommendationUser = createRecommendationUser();
+        PermissionSet dreamhousePermissions = [
+            SELECT Id
+            FROM PermissionSet
+            WHERE Name = 'dreamhouse'
+        ];
+        insert new PermissionSetAssignment(
+            AssigneeId = recommendationUser.Id,
+            PermissionSetId = dreamhousePermissions.Id
+        );
+
+        System.runAs(recommendationUser) {
+            Opportunity opportunity = new Opportunity(
+                Name = 'Hardware renewal',
+                StageName = 'Prospecting',
+                CloseDate = Date.today().addDays(30),
+                Preferred_Product_Family__c = 'Hardware'
+            );
+            insert opportunity;
+
+            insert new List<Product2>{
+                new Product2(
+                    Name = 'Recommended Laptop',
+                    ProductCode = 'TEST-LAPTOP',
+                    Family = 'Hardware',
+                    IsActive = true
+                ),
+                new Product2(
+                    Name = 'Inactive Printer',
+                    ProductCode = 'TEST-PRINTER',
+                    Family = 'Hardware',
+                    IsActive = false
+                ),
+                new Product2(
+                    Name = 'Software Subscription',
+                    ProductCode = 'TEST-SOFTWARE',
+                    Family = 'Software',
+                    IsActive = true
+                )
+            };
 
             Test.startTest();
-            List<Product2> products = SampleDataController.getProducts(
-                null,
-                null,
-                null
+            List<Product2> products = SampleDataController.getProductsForOpportunity(
+                opportunity.Id
             );
             Test.stopTest();
 
-            Assert.areEqual(3, products.size(), 'Expected all products.');
-            Assert.areEqual('Alpha Router', products[0].Name);
-            Assert.areEqual('Beta Support', products[1].Name);
-            Assert.areEqual('Gamma Legacy', products[2].Name);
-        }
-    }
-
-    @IsTest
-    static void getProductsAppliesOptionalFilters() {
-        System.runAs(new User(Id = UserInfo.getUserId())) {
-            String family = getFirstActiveProductFamily();
-            insertProducts();
-
-            Test.startTest();
-            List<Product2> textMatches = SampleDataController.getProducts(
-                'SUP-100',
-                null,
-                null
-            );
-            List<Product2> inactiveProducts = SampleDataController.getProducts(
-                null,
-                null,
-                false
-            );
-            List<Product2> familyMatches = SampleDataController.getProducts(
-                null,
-                family == null ? 'Unused Family' : family,
-                null
-            );
-            List<Product2> combinedMatches = SampleDataController.getProducts(
-                'Alpha',
-                family,
-                true
-            );
-            Test.stopTest();
-
-            Assert.areEqual(1, textMatches.size(), 'Expected a code match.');
-            Assert.areEqual('Beta Support', textMatches[0].Name);
             Assert.areEqual(
                 1,
-                inactiveProducts.size(),
-                'Expected one inactive product.'
+                products.size(),
+                'Only active products in the preferred family should be returned.'
             );
-            Assert.areEqual('Gamma Legacy', inactiveProducts[0].Name);
-            Assert.areEqual(
-                family == null ? 0 : 1,
-                familyMatches.size(),
-                'Expected the family filter to be applied.'
-            );
-            Assert.areEqual(
-                1,
-                combinedMatches.size(),
-                'Expected one combined match.'
-            );
-            Assert.areEqual('Alpha Router', combinedMatches[0].Name);
+            Assert.areEqual('Recommended Laptop', products[0].Name);
+            Assert.areEqual('Hardware', products[0].Family);
+            Assert.isTrue(products[0].IsActive);
         }
     }
 
-    private static void insertProducts() {
-        String family = getFirstActiveProductFamily();
-        insert new List<Product2>{
-            new Product2(
-                Name = 'Gamma Legacy',
-                ProductCode = 'LEG-100',
-                IsActive = false
-            ),
-            new Product2(
-                Name = 'Alpha Router',
-                ProductCode = 'RTR-100',
-                Family = family,
-                IsActive = true
-            ),
-            new Product2(
-                Name = 'Beta Support',
-                ProductCode = 'SUP-100',
-                IsActive = true
-            )
-        };
-    }
-
-    private static String getFirstActiveProductFamily() {
-        for (
-            Schema.PicklistEntry entry : Product2.Family
-                .getDescribe()
-                .getPicklistValues()
-        ) {
-            if (entry.isActive()) {
-                return entry.getValue();
-            }
-        }
-        return null;
+    private static User createRecommendationUser() {
+        Profile standardUserProfile = [
+            SELECT Id
+            FROM Profile
+            WHERE Name = 'Standard User'
+            LIMIT 1
+        ];
+        User user = new User(
+            Alias = 'product',
+            Email = 'product.recommendations@example.com',
+            EmailEncodingKey = 'UTF-8',
+            LastName = 'Recommendations',
+            LanguageLocaleKey = 'en_US',
+            LocaleSidKey = 'en_US',
+            ProfileId = standardUserProfile.Id,
+            TimeZoneSidKey = 'America/Los_Angeles',
+            Username = 'product.recommendations.' +
+                DateTime.now().getTime() +
+                '@example.com'
+        );
+        insert user;
+        return user;
     }
 }
