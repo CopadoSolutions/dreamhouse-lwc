@@ -1,3 +1,4 @@
+// Included as a dependency of the dreamhouse permission set.
 public with sharing class PagedResult {
     @AuraEnabled
     public Integer pageSize { get; set; }
