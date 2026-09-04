@@ -11,6 +11,55 @@ public with sharing class SampleDataController {
         insertContacts();
     }
 
+    /**
+     * Returns products visible to the current user that match the supplied
+     * optional filters.
+     *
+     * @param searchTerm Text contained in a product name or product code
+     * @param family Exact product family
+     * @param isActive Product active status
+     * @return Up to 200 matching Product2 records, sorted by name
+     */
+    @SuppressWarnings('PMD.AvoidBooleanMethodParameters')
+    @AuraEnabled(cacheable=true)
+    public static List<Product2> getProducts(
+        String searchTerm,
+        String family,
+        Boolean isActive
+    ) {
+        List<String> conditions = new List<String>();
+        Map<String, Object> bindVariables = new Map<String, Object>();
+
+        if (String.isNotBlank(searchTerm)) {
+            conditions.add(
+                '(Name LIKE :searchPattern OR ProductCode LIKE :searchPattern)'
+            );
+            bindVariables.put('searchPattern', '%' + searchTerm.trim() + '%');
+        }
+        if (String.isNotBlank(family)) {
+            conditions.add('Family = :family');
+            bindVariables.put('family', family.trim());
+        }
+        if (isActive != null) {
+            conditions.add('IsActive = :isActive');
+            bindVariables.put('isActive', isActive);
+        }
+
+        String query =
+            'SELECT Id, Name, ProductCode, Description, Family, IsActive ' +
+            'FROM Product2';
+        if (!conditions.isEmpty()) {
+            query += ' WHERE ' + String.join(conditions, ' AND ');
+        }
+        query += ' ORDER BY Name, ProductCode, Id LIMIT 200';
+
+        return (List<Product2>) Database.queryWithBinds(
+            query,
+            bindVariables,
+            AccessLevel.USER_MODE
+        );
+    }
+
     private static void insertBrokers() {
         StaticResource brokersResource = [
             SELECT Id, Body
