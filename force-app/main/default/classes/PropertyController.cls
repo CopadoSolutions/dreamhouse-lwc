@@ -1,3 +1,4 @@
+// Included as a dependency of the dreamhouse permission set.
 public with sharing class PropertyController {
     private static final Decimal DEFAULT_MAX_PRICE = 9999999;
     private static final Integer DEFAULT_PAGE_SIZE = 9;
