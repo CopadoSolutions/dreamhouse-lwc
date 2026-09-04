@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!-- Included as a dependency of the dreamhouse permission set. -->
 <CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
     <customObject>true</customObject>
+    <description>Provides Dreamhouse application navigation.</description>
     <motif>Custom85: Real Estate Sign</motif>
 </CustomTab>
