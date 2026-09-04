@@ -1,4 +1,6 @@
+// Aura-enabled helpers for uploading files and linking them to Salesforce records.
 public with sharing class FileUtilities {
+    // Creates a ContentVersion from base64 data and links it to the given record.
     @AuraEnabled
     public static String createFile(
         String base64data,
@@ -12,6 +14,7 @@ public with sharing class FileUtilities {
             contentVersion.PathOnClient = filename;
             insert contentVersion;
 
+            // ContentDocumentId is only available after insert.
             contentVersion = [
                 SELECT ContentDocumentId
                 FROM ContentVersion
