@@ -1,4 +1,6 @@
 public with sharing class SampleDataController {
+
+///address
     @AuraEnabled
     public static void importSampleData() {
         delete [SELECT Id FROM Case];
