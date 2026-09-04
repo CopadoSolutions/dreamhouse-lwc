@@ -49,5 +49,8 @@
     },
     "volta": {
         "node": "22.15.0"
+    },
+    "dependencies": {
+        "@copado/agentia-cli": "^0.73.0-alpha.0"
     }
 }
