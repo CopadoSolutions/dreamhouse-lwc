@@ -1,3 +1,4 @@
+/** Confirms sample import creates broker, property, and contact records. */
 @isTest
 private class TestSampleDataController {
     @isTest

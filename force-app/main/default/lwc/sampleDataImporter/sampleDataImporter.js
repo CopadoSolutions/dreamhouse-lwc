@@ -2,6 +2,7 @@ import { LightningElement } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import importSampleData from '@salesforce/apex/SampleDataController.importSampleData';
 
+/** UI trigger for importing Dreamhouse sample data via SampleDataController. */
 export default class SampleDataImporter extends LightningElement {
     handleImportSampleData() {
         importSampleData()
