@@ -72,6 +72,59 @@ private class TestPropertyController {
     }
 
     @isTest
+    static void testGetPagedPropertyListDefaultPageSize() {
+        Profile standardUserProfile = [
+            SELECT Name, Id
+            FROM Profile
+            WHERE
+                UserType = 'Standard'
+                AND PermissionsPrivacyDataAccess = FALSE
+                AND PermissionsSubmitMacrosAllowed = TRUE
+                AND PermissionsMassInlineEdit = TRUE
+            LIMIT 1
+        ];
+        User testUser = new User(
+            Alias = 'standt2',
+            Email = 'standarduser2@testorg.com',
+            EmailEncodingKey = 'UTF-8',
+            LastName = 'Testing',
+            LanguageLocaleKey = 'en_US',
+            LocaleSidKey = 'en_US',
+            ProfileId = standardUserProfile.Id,
+            TimeZoneSidKey = 'America/Los_Angeles',
+            UserName = 'standarduser2@dreamhouse-testorg.com'
+        );
+        insert testUser;
+        PermissionSet ps = [
+            SELECT Id
+            FROM PermissionSet
+            WHERE Name = 'dreamhouse'
+        ];
+        insert new PermissionSetAssignment(
+            AssigneeId = testUser.Id,
+            PermissionSetId = ps.Id
+        );
+
+        System.runAs(new User(Id = UserInfo.getUserId())) {
+            TestPropertyController.createProperties(15);
+        }
+        System.runAs(testUser) {
+            Test.startTest();
+            PagedResult result = PropertyController.getPagedPropertyList(
+                '',
+                999999,
+                0,
+                0,
+                null,
+                1
+            );
+            Test.stopTest();
+            Assert.areEqual(12, result.pageSize);
+            Assert.areEqual(12, result.records.size());
+        }
+    }
+
+    @isTest
     static void testGetPicturesNoResults() {
         Property__c property = new Property__c(Name = 'Name');
         insert property;
