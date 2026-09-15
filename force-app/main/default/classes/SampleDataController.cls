@@ -1,3 +1,4 @@
+/** Imports Dreamhouse sample brokers, properties, and contacts for demos. */
 public with sharing class SampleDataController {
     @AuraEnabled
     public static void importSampleData() {
