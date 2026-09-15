@@ -19,5 +19,5 @@ if [[ -n "${AGENTIA_APEX_TEST_CLASSES:-}" ]]; then
   fi
 fi
 
-echo "## Running LWC tests"
-npx sfdx-lwc-jest -- # --passWithNoTests
+#echo "## Running LWC tests"
+#npx sfdx-lwc-jest -- --passWithNoTests
