@@ -43,3 +43,5 @@ $RECYCLE.BIN/
 # Local environment variables
 .env
 .agentia/config.user.json
+AGENTS.md
+.cursor

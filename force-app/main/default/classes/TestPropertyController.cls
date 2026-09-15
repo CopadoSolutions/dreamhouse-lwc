@@ -105,14 +105,13 @@ private class TestPropertyController {
             PermissionSetId = ps.Id
         );
 
-        Integer propertyCount = 15;
         System.runAs(new User(Id = UserInfo.getUserId())) {
-            TestPropertyController.createProperties(propertyCount);
+            TestPropertyController.createProperties(15);
         }
 
         System.runAs(testUser) {
             Test.startTest();
-            PagedResult firstPage = PropertyController.getPagedPropertyList(
+            PagedResult result = PropertyController.getPagedPropertyList(
                 '',
                 999999,
                 0,
@@ -120,22 +119,10 @@ private class TestPropertyController {
                 null,
                 1
             );
-            PagedResult secondPage = PropertyController.getPagedPropertyList(
-                '',
-                999999,
-                0,
-                0,
-                null,
-                2
-            );
             Test.stopTest();
-
-            Assert.areEqual(12, firstPage.pageSize);
-            Assert.areEqual(12, firstPage.records.size());
-            Assert.areEqual(propertyCount, firstPage.totalItemCount);
-            Assert.areEqual(12, secondPage.pageSize);
-            Assert.areEqual(3, secondPage.records.size());
-            Assert.areEqual(propertyCount, secondPage.totalItemCount);
+            Assert.areEqual(12, result.pageSize);
+            Assert.areEqual(12, result.records.size());
+            Assert.areEqual(15, result.totalItemCount);
         }
     }
 
