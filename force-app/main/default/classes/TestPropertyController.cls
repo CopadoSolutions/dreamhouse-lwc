@@ -72,6 +72,26 @@ private class TestPropertyController {
     }
 
     @isTest
+    static void testGetPagedPropertyListDefaultPageSize() {
+        TestPropertyController.createProperties(15);
+
+        Test.startTest();
+        PagedResult result = PropertyController.getPagedPropertyList(
+            '',
+            999999,
+            0,
+            0,
+            null,
+            1
+        );
+        Test.stopTest();
+
+        Assert.areEqual(12, result.pageSize);
+        Assert.areEqual(12, result.records.size());
+        Assert.areEqual(15, result.totalItemCount);
+    }
+
+    @isTest
     static void testGetPicturesNoResults() {
         Property__c property = new Property__c(Name = 'Name');
         insert property;
