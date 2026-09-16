@@ -1,6 +1,6 @@
 public with sharing class PropertyController {
     private static final Decimal DEFAULT_MAX_PRICE = 9999999;
-    private static final Integer DEFAULT_PAGE_SIZE = 1;
+    private static final Integer DEFAULT_PAGE_SIZE = 12;
 
     /**
      * Endpoint that retrieves a paged and filtered list of properties
