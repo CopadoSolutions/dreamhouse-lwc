@@ -89,6 +89,18 @@ private class TestPropertyController {
         Assert.areEqual(12, result.pageSize);
         Assert.areEqual(12, result.records.size());
         Assert.areEqual(15, result.totalItemCount);
+
+        PagedResult page2 = PropertyController.getPagedPropertyList(
+            '',
+            999999,
+            0,
+            0,
+            null,
+            2
+        );
+        Assert.areEqual(12, page2.pageSize);
+        Assert.areEqual(3, page2.records.size());
+        Assert.areEqual(15, page2.totalItemCount);
     }
 
     @isTest
