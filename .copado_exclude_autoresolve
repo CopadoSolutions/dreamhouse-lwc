@@ -1,13 +1,3 @@
-Jury:?
-Cirteria? 
-
-
-
-https://developer.copado.com/docs#extending-agentia (preview: https://id-preview--84c7d369-7c56-464b-b2af-1c6796a74cba.lovable.app/docs#extending-agentia).
-
-
-# This is a sample .copado_exclude_autoresolve file
-
 # Lines starting with '#' are comments and are ignored by Copado
 
 # Use '**' to match any character across directory levels
