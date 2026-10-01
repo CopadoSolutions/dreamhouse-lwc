@@ -1,0 +1,36 @@
+<template>
+    <lightning-card title="Similar Properties" icon-name="custom:custom85">
+        <template lwc:if={hasNoPropertyId}>
+            <c-error-panel
+                friendly-message="Select a property to see similar properties"
+            ></c-error-panel>
+        </template>
+        <template lwc:elseif={properties.error}>
+            <c-error-panel
+                friendly-message="Error retrieving similar properties"
+                errors={properties.error}
+            ></c-error-panel>
+        </template>
+        <template lwc:elseif={isLoading}>
+            <lightning-spinner
+                alternative-text="Loading similar properties"
+                size="small"
+            ></lightning-spinner>
+        </template>
+        <template lwc:elseif={hasProperties}>
+            <div class="slds-grid slds-wrap slds-var-p-around_small">
+                <template for:each={properties.data} for:item="property">
+                    <c-property-tile
+                        property={property}
+                        key={property.Id}
+                        onselected={handleTileSelected}
+                        class="slds-col slds-size_1-of-1 slds-var-m-bottom_x-small"
+                    ></c-property-tile>
+                </template>
+            </div>
+        </template>
+        <template lwc:else>
+            <p class="slds-var-p-around_small">No similar properties found.</p>
+        </template>
+    </lightning-card>
+</template>

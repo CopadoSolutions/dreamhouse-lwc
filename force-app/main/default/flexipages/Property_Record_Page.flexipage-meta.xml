@@ -496,6 +496,12 @@
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
+                <componentName>similarProperties</componentName>
+                <identifier>c_similarProperties</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
                 <componentName>brokerCard</componentName>
                 <identifier>c_brokerCard2</identifier>
             </componentInstance>

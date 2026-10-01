@@ -1,6 +1,8 @@
 public with sharing class PropertyController {
     private static final Decimal DEFAULT_MAX_PRICE = 9999999;
     private static final Integer DEFAULT_PAGE_SIZE = 1;
+    private static final Decimal SIMILAR_PRICE_TOLERANCE = 0.2;
+    private static final Integer SIMILAR_PROPERTY_LIMIT = 5;
 
     /**
      * Endpoint that retrieves a paged and filtered list of properties
@@ -107,6 +109,67 @@ public with sharing class PropertyController {
             WHERE ContentDocumentId IN :contentIds AND IsLatest = TRUE
             WITH USER_MODE
             ORDER BY CreatedDate
+        ];
+    }
+
+    /**
+     * Endpoint that retrieves up to five similar properties in the same city
+     * whose price is within 20% of the given property.
+     * @param propertyId Property Id to compare against
+     * @return Similar properties, excluding the given record, ordered by price
+     */
+    @AuraEnabled(cacheable=true scope='global')
+    public static List<Property__c> getSimilarProperties(Id propertyId) {
+        if (propertyId == null) {
+            return new List<Property__c>();
+        }
+
+        List<Property__c> currentProperties = [
+            SELECT City__c, Price__c
+            FROM Property__c
+            WHERE Id = :propertyId
+            WITH USER_MODE
+            LIMIT 1
+        ];
+        if (
+            currentProperties.isEmpty() ||
+            currentProperties[0].City__c == null ||
+            currentProperties[0].Price__c == null
+        ) {
+            return new List<Property__c>();
+        }
+
+        Property__c currentProperty = currentProperties[0];
+        Decimal minPrice =
+            currentProperty.Price__c -
+            (currentProperty.Price__c * SIMILAR_PRICE_TOLERANCE);
+        Decimal maxPrice =
+            currentProperty.Price__c +
+            (currentProperty.Price__c * SIMILAR_PRICE_TOLERANCE);
+        String city = currentProperty.City__c;
+        Integer similarLimit = SIMILAR_PROPERTY_LIMIT;
+
+        return [
+            SELECT
+                Id,
+                Name,
+                Address__c,
+                City__c,
+                State__c,
+                Description__c,
+                Price__c,
+                Baths__c,
+                Beds__c,
+                Thumbnail__c
+            FROM Property__c
+            WHERE
+                Id != :propertyId
+                AND City__c = :city
+                AND Price__c >= :minPrice
+                AND Price__c <= :maxPrice
+            WITH USER_MODE
+            ORDER BY Price__c
+            LIMIT :similarLimit
         ];
     }
 }
