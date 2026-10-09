@@ -1,0 +1,26 @@
+[
+    {
+        "Id": "a012F000009ovH1QAI",
+        "Name": "Low Bound",
+        "Address__c": "127 Endicott St",
+        "City__c": "Boston",
+        "State__c": "MA",
+        "Description__c": "Nearby listing",
+        "Price__c": 80000,
+        "Baths__c": 1,
+        "Beds__c": 2,
+        "Thumbnail__c": "https://example.com/house.jpg"
+    },
+    {
+        "Id": "a012F000009ovH2QAI",
+        "Name": "Mid Range",
+        "Address__c": "48 Brattle St",
+        "City__c": "Boston",
+        "State__c": "MA",
+        "Description__c": "Nearby listing",
+        "Price__c": 110000,
+        "Baths__c": 2,
+        "Beds__c": 3,
+        "Thumbnail__c": "https://example.com/house2.jpg"
+    }
+]

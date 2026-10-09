@@ -35,6 +35,12 @@
         </itemInstances>
         <itemInstances>
             <componentInstance>
+                <componentName>similarProperties</componentName>
+                <identifier>c_similarProperties</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
                 <componentName>daysOnMarket</componentName>
                 <identifier>daysOnMarket</identifier>
             </componentInstance>

@@ -150,4 +150,151 @@ private class TestPropertyController {
         Assert.areEqual(1, items.size());
         Assert.areEqual(MOCK_PICTURE_NAME, items[0].Title);
     }
+
+    @isTest
+    static void testGetSimilarProperties() {
+        Property__c currentProperty = new Property__c(
+            Name = 'Current',
+            City__c = 'Boston',
+            Price__c = 100000,
+            Beds__c = 3,
+            Baths__c = 2
+        );
+        List<Property__c> properties = new List<Property__c>{
+            currentProperty,
+            new Property__c(
+                Name = 'Low Bound',
+                City__c = 'Boston',
+                Price__c = 80000,
+                Beds__c = 2,
+                Baths__c = 1
+            ),
+            new Property__c(
+                Name = 'Mid Range',
+                City__c = 'Boston',
+                Price__c = 110000,
+                Beds__c = 3,
+                Baths__c = 2
+            ),
+            new Property__c(
+                Name = 'High Bound',
+                City__c = 'Boston',
+                Price__c = 120000,
+                Beds__c = 4,
+                Baths__c = 2
+            ),
+            new Property__c(
+                Name = 'Fourth Match',
+                City__c = 'Boston',
+                Price__c = 90000,
+                Beds__c = 2,
+                Baths__c = 1
+            ),
+            new Property__c(
+                Name = 'Fifth Match',
+                City__c = 'Boston',
+                Price__c = 95000,
+                Beds__c = 2,
+                Baths__c = 2
+            ),
+            new Property__c(
+                Name = 'Too Cheap',
+                City__c = 'Boston',
+                Price__c = 79999,
+                Beds__c = 1,
+                Baths__c = 1
+            ),
+            new Property__c(
+                Name = 'Too Expensive',
+                City__c = 'Boston',
+                Price__c = 120001,
+                Beds__c = 5,
+                Baths__c = 3
+            ),
+            new Property__c(
+                Name = 'Other City',
+                City__c = 'Chicago',
+                Price__c = 100000,
+                Beds__c = 3,
+                Baths__c = 2
+            )
+        };
+        insert properties;
+
+        Test.startTest();
+        List<Property__c> similar = PropertyController.getSimilarProperties(
+            currentProperty.Id
+        );
+        List<Property__c> missing = PropertyController.getSimilarProperties(
+            null
+        );
+        Test.stopTest();
+
+        Assert.isTrue(
+            missing.isEmpty(),
+            'A null property should return no rows'
+        );
+        Assert.areEqual(
+            5,
+            similar.size(),
+            'Only five similar properties are returned'
+        );
+
+        Set<String> names = new Set<String>();
+        Decimal previousPrice = 0;
+        for (Property__c property : similar) {
+            names.add(property.Name);
+            Assert.areNotEqual(
+                currentProperty.Id,
+                property.Id,
+                'The current property is excluded'
+            );
+            Assert.areEqual(
+                'Boston',
+                property.City__c,
+                'Similar properties stay in the same city'
+            );
+            Assert.isTrue(
+                property.Price__c >= previousPrice,
+                'Results are ordered by price'
+            );
+            previousPrice = property.Price__c;
+        }
+        Assert.isTrue(
+            names.contains('Low Bound'),
+            'The low price boundary is included'
+        );
+        Assert.isTrue(
+            names.contains('Fourth Match'),
+            'An in-range property is included'
+        );
+        Assert.isTrue(
+            names.contains('Fifth Match'),
+            'An in-range property is included'
+        );
+        Assert.isTrue(
+            names.contains('Mid Range'),
+            'An in-range property is included'
+        );
+        Assert.isTrue(
+            names.contains('High Bound'),
+            'The high price boundary is included'
+        );
+        Assert.isFalse(
+            names.contains('Too Cheap'),
+            'A price below the range is excluded'
+        );
+        Assert.isFalse(
+            names.contains('Too Expensive'),
+            'A price above the range is excluded'
+        );
+        Assert.isFalse(
+            names.contains('Other City'),
+            'A different city is excluded'
+        );
+        Assert.isFalse(
+            names.contains('Current'),
+            'The current property is excluded'
+        );
+    }
 }
