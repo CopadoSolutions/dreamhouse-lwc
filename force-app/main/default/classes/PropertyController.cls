@@ -76,6 +76,52 @@ public with sharing class PropertyController {
     }
 
     /**
+     * Endpoint that retrieves similar properties based on city and price range
+     * @param propertyId Property Id to find similar properties for
+     * @return List of up to 5 Property__c records in the same city with price within 20% of the given property
+     */
+    @AuraEnabled(cacheable=true)
+    public static List<Property__c> getSimilarProperties(Id propertyId) {
+        Property__c property = [
+            SELECT City__c, Price__c
+            FROM Property__c
+            WHERE Id = :propertyId
+            WITH USER_MODE
+            LIMIT 1
+        ];
+
+        Decimal price = property.Price__c ?? 0;
+        Decimal minPrice = price * 0.8;
+        Decimal maxPrice = price * 1.2;
+        String city = property.City__c;
+
+        return [
+            SELECT
+                Id,
+                Name,
+                Address__c,
+                City__c,
+                State__c,
+                Description__c,
+                Price__c,
+                Baths__c,
+                Beds__c,
+                Thumbnail__c,
+                Location__Latitude__s,
+                Location__Longitude__s
+            FROM Property__c
+            WHERE
+                Id != :propertyId
+                AND City__c = :city
+                AND Price__c >= :minPrice
+                AND Price__c <= :maxPrice
+            WITH USER_MODE
+            ORDER BY Price__c
+            LIMIT 5
+        ];
+    }
+
+    /**
      * Endpoint that retrieves pictures associated with a property
      * @param propertyId Property Id
      * @return List of ContentVersion holding the pictures

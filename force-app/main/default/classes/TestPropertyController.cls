@@ -92,6 +92,135 @@ private class TestPropertyController {
     }
 
     @isTest
+    static void testGetSimilarProperties() {
+        // Setup: create a base property and several candidate properties
+        Property__c baseProperty = new Property__c(
+            Name = 'Base Property',
+            City__c = 'San Francisco',
+            Price__c = 500000,
+            Beds__c = 3,
+            Baths__c = 2
+        );
+        insert baseProperty;
+
+        // Within range: same city, prices within 20% (400000 - 600000)
+        List<Property__c> similarOnes = new List<Property__c>{
+            new Property__c(
+                Name = 'Similar 1',
+                City__c = 'San Francisco',
+                Price__c = 480000,
+                Beds__c = 2,
+                Baths__c = 1
+            ),
+            new Property__c(
+                Name = 'Similar 2',
+                City__c = 'San Francisco',
+                Price__c = 550000,
+                Beds__c = 4,
+                Baths__c = 3
+            )
+        };
+
+        // Out of range: different city or price outside 20% band
+        List<Property__c> excludedOnes = new List<Property__c>{
+            new Property__c(
+                Name = 'Other City',
+                City__c = 'Los Angeles',
+                Price__c = 500000,
+                Beds__c = 3,
+                Baths__c = 2
+            ),
+            new Property__c(
+                Name = 'Too Expensive',
+                City__c = 'San Francisco',
+                Price__c = 700000,
+                Beds__c = 5,
+                Baths__c = 4
+            ),
+            new Property__c(
+                Name = 'Too Cheap',
+                City__c = 'San Francisco',
+                Price__c = 200000,
+                Beds__c = 1,
+                Baths__c = 1
+            )
+        };
+
+        insert similarOnes;
+        insert excludedOnes;
+
+        Test.startTest();
+        List<Property__c> results = PropertyController.getSimilarProperties(
+            baseProperty.Id
+        );
+        Test.stopTest();
+
+        // Only the 2 in-range, same-city properties should be returned
+        Assert.areEqual(2, results.size(), 'Expected 2 similar properties');
+
+        // Collect returned names for assertion
+        Set<String> returnedNames = new Set<String>();
+        for (Property__c p : results) {
+            returnedNames.add(p.Name);
+        }
+        Assert.isTrue(
+            returnedNames.contains('Similar 1'),
+            'Similar 1 should be included'
+        );
+        Assert.isTrue(
+            returnedNames.contains('Similar 2'),
+            'Similar 2 should be included'
+        );
+
+        // The base property itself must not be returned
+        for (Property__c p : results) {
+            Assert.areNotEqual(
+                baseProperty.Id,
+                p.Id,
+                'Base property must be excluded from results'
+            );
+        }
+    }
+
+    @isTest
+    static void testGetSimilarPropertiesMaxFive() {
+        // Verify the result is capped at 5 even when more matches exist
+        Property__c baseProperty = new Property__c(
+            Name = 'Base Property',
+            City__c = 'Austin',
+            Price__c = 300000,
+            Beds__c = 2,
+            Baths__c = 1
+        );
+        insert baseProperty;
+
+        List<Property__c> candidates = new List<Property__c>();
+        for (Integer i = 0; i < 7; i++) {
+            candidates.add(
+                new Property__c(
+                    Name = 'Candidate ' + i,
+                    City__c = 'Austin',
+                    Price__c = 300000,
+                    Beds__c = 2,
+                    Baths__c = 1
+                )
+            );
+        }
+        insert candidates;
+
+        Test.startTest();
+        List<Property__c> results = PropertyController.getSimilarProperties(
+            baseProperty.Id
+        );
+        Test.stopTest();
+
+        Assert.isTrue(
+            results.size() <= 5,
+            'Result must be capped at 5 properties'
+        );
+    }
+
+    @isTest
     static void testGetPicturesNoResults() {
         Property__c property = new Property__c(Name = 'Name');
         insert property;

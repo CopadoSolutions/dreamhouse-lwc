@@ -1,0 +1,30 @@
+[
+    {
+        "Id": "a012F000009ovH1QAI",
+        "Name": "Similar House 1",
+        "Address__c": "100 Main St",
+        "City__c": "San Francisco",
+        "State__c": "CA",
+        "Description__c": "A lovely home in the same city",
+        "Price__c": 480000,
+        "Baths__c": 2,
+        "Beds__c": 3,
+        "Thumbnail__c": "https://example.com/house1.jpg",
+        "Location__Latitude__s": 37.7749,
+        "Location__Longitude__s": -122.4194
+    },
+    {
+        "Id": "a012F000009ovH2QAI",
+        "Name": "Similar House 2",
+        "Address__c": "200 Oak Ave",
+        "City__c": "San Francisco",
+        "State__c": "CA",
+        "Description__c": "Another great option nearby",
+        "Price__c": 530000,
+        "Baths__c": 1,
+        "Beds__c": 2,
+        "Thumbnail__c": "https://example.com/house2.jpg",
+        "Location__Latitude__s": 37.7751,
+        "Location__Longitude__s": -122.4184
+    }
+]
