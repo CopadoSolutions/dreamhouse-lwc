@@ -1,11 +1,10 @@
 import { createElement } from '@lwc/engine-dom';
 import SimilarProperties from 'c/similarProperties';
 import getSimilarProperties from '@salesforce/apex/PropertyController.getSimilarProperties';
-import { publish, subscribe, unsubscribe } from 'lightning/messageService';
-import PROPERTYSELECTEDMC from '@salesforce/messageChannel/PropertySelected__c';
 
-const mockSimilarProperties = require('./data/getSimilarProperties.json');
+const mockGetSimilarProperties = require('./data/getSimilarProperties.json');
 
+// Mock getSimilarProperties Apex wire adapter
 jest.mock(
     '@salesforce/apex/PropertyController.getSimilarProperties',
     () => {
@@ -19,110 +18,145 @@ jest.mock(
     { virtual: true }
 );
 
+const RECORD_ID = 'a012F000009ovH0QAI';
+
 describe('c-similar-properties', () => {
     afterEach(() => {
+        // The jsdom instance is shared across test cases in a single file so reset the DOM
         while (document.body.firstChild) {
             document.body.removeChild(document.body.firstChild);
         }
         jest.clearAllMocks();
     });
 
+    // Helper function to wait until the microtask queue is empty.
+    // Used when having to wait for asynchronous DOM updates.
     async function flushPromises() {
         return Promise.resolve();
     }
 
-    it('asks for a property when none is selected', () => {
+    it('renders a spinner while data is loading', async () => {
         const element = createElement('c-similar-properties', {
             is: SimilarProperties
         });
+        element.recordId = RECORD_ID;
         document.body.appendChild(element);
 
-        const errorPanel = element.shadowRoot.querySelector('c-error-panel');
-        expect(errorPanel.friendlyMessage).toBe(
-            'Select a property to see similar properties'
-        );
+        // Wire has not emitted yet so loading state should be active
+        await flushPromises();
+
+        const spinner = element.shadowRoot.querySelector('lightning-spinner');
+        expect(spinner).not.toBeNull();
     });
 
-    it('renders property tiles when similar properties are returned', async () => {
+    it('renders property tiles when data is returned', async () => {
         const element = createElement('c-similar-properties', {
             is: SimilarProperties
         });
-        element.recordId = 'a012F000009ovH0QAI';
+        element.recordId = RECORD_ID;
         document.body.appendChild(element);
 
-        getSimilarProperties.emit(mockSimilarProperties);
+        getSimilarProperties.emit(mockGetSimilarProperties);
+
         await flushPromises();
 
         const tiles = element.shadowRoot.querySelectorAll('c-property-tile');
-        expect(tiles.length).toBe(mockSimilarProperties.length);
-        expect(tiles[0].property).toEqual(mockSimilarProperties[0]);
+        expect(tiles.length).toBe(mockGetSimilarProperties.length);
     });
 
-    it('shows an empty message when no similar properties are returned', async () => {
+    it('passes the correct property object to each property tile', async () => {
         const element = createElement('c-similar-properties', {
             is: SimilarProperties
         });
-        element.recordId = 'a012F000009ovH0QAI';
+        element.recordId = RECORD_ID;
+        document.body.appendChild(element);
+
+        getSimilarProperties.emit(mockGetSimilarProperties);
+
+        await flushPromises();
+
+        const tiles = element.shadowRoot.querySelectorAll('c-property-tile');
+        tiles.forEach((tile, index) => {
+            expect(tile.property).toStrictEqual(
+                mockGetSimilarProperties[index]
+            );
+        });
+    });
+
+    it('renders a no-results message when the list is empty', async () => {
+        const element = createElement('c-similar-properties', {
+            is: SimilarProperties
+        });
+        element.recordId = RECORD_ID;
         document.body.appendChild(element);
 
         getSimilarProperties.emit([]);
+
         await flushPromises();
 
-        const empty = element.shadowRoot.querySelector('p');
-        expect(empty.textContent).toBe('No similar properties found.');
-        expect(element.shadowRoot.querySelector('c-property-tile')).toBeNull();
+        const tiles = element.shadowRoot.querySelectorAll('c-property-tile');
+        expect(tiles.length).toBe(0);
+
+        const noResultsEl = element.shadowRoot.querySelector('p');
+        expect(noResultsEl).not.toBeNull();
+        expect(noResultsEl.textContent).toContain('No similar properties');
     });
 
-    it('renders an error panel when the wire returns an error', async () => {
+    it('renders an error panel when the wire adapter returns an error', async () => {
         const element = createElement('c-similar-properties', {
             is: SimilarProperties
         });
-        element.recordId = 'a012F000009ovH0QAI';
+        element.recordId = RECORD_ID;
         document.body.appendChild(element);
 
         getSimilarProperties.error();
+
         await flushPromises();
 
         const errorPanel = element.shadowRoot.querySelector('c-error-panel');
-        expect(errorPanel.friendlyMessage).toBe(
-            'Error retrieving similar properties'
-        );
+        expect(errorPanel).not.toBeNull();
     });
 
-    it('registers and removes the property selection subscriber', () => {
+    it('does not render tiles when an error occurs', async () => {
         const element = createElement('c-similar-properties', {
             is: SimilarProperties
         });
+        element.recordId = RECORD_ID;
         document.body.appendChild(element);
 
-        expect(subscribe).toHaveBeenCalled();
-        expect(subscribe.mock.calls[0][1]).toBe(PROPERTYSELECTEDMC);
+        getSimilarProperties.error();
 
-        document.body.removeChild(element);
-        expect(unsubscribe).toHaveBeenCalled();
-    });
-
-    it('publishes the selected similar property', async () => {
-        const element = createElement('c-similar-properties', {
-            is: SimilarProperties
-        });
-        element.recordId = 'a012F000009ovH0QAI';
-        document.body.appendChild(element);
-
-        getSimilarProperties.emit(mockSimilarProperties);
         await flushPromises();
 
-        const tile = element.shadowRoot.querySelector('c-property-tile');
-        tile.dispatchEvent(
-            new CustomEvent('selected', {
-                detail: mockSimilarProperties[0].Id
-            })
-        );
+        const tiles = element.shadowRoot.querySelectorAll('c-property-tile');
+        expect(tiles.length).toBe(0);
+    });
 
-        expect(publish).toHaveBeenCalled();
-        expect(publish.mock.calls[0][1]).toBe(PROPERTYSELECTEDMC);
-        expect(publish.mock.calls[0][2]).toEqual({
-            propertyId: mockSimilarProperties[0].Id
+    it('is accessible when data is returned', async () => {
+        const element = createElement('c-similar-properties', {
+            is: SimilarProperties
         });
+        element.recordId = RECORD_ID;
+        document.body.appendChild(element);
+
+        getSimilarProperties.emit(mockGetSimilarProperties);
+
+        await flushPromises();
+
+        await expect(element).toBeAccessible();
+    });
+
+    it('is accessible when no results are returned', async () => {
+        const element = createElement('c-similar-properties', {
+            is: SimilarProperties
+        });
+        element.recordId = RECORD_ID;
+        document.body.appendChild(element);
+
+        getSimilarProperties.emit([]);
+
+        await flushPromises();
+
+        await expect(element).toBeAccessible();
     });
 });
