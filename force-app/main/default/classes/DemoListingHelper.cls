@@ -47,4 +47,19 @@ public with sharing class DemoListingHelper {
         }
         return price * (1 + (percent / FULL_PERCENT));
     }
+
+    /**
+     * @param price Listing price
+     * @param candidate Price to compare
+     * @param percent Allowed percent above and below the listing price
+     * @return True when the candidate sits inside the price band
+     * @example
+     * Boolean similar = DemoListingHelper.isWithinBand(500000, 550000, 20);
+     */
+    public static Boolean isWithinBand(Decimal price, Decimal candidate, Decimal percent) {
+        if (price == null || candidate == null || percent == null) {
+            return false;
+        }
+        return candidate >= lowerPrice(price, percent) && candidate <= upperPrice(price, percent);
+    }
 }
