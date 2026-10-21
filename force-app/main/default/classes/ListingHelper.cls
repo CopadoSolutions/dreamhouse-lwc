@@ -1,20 +1,20 @@
 /**
- * Demo helper for listing price bands. Used to show a quality-gate coverage miss.
+ * Helper methods for listing price bands.
  */
-public with sharing class DemoListingHelper {
+public with sharing class ListingHelper {
     private static final Decimal FULL_PERCENT = 100;
 
     /**
      * Prevents instantiation. Use the static methods.
      */
-    private DemoListingHelper() {
+    private ListingHelper() {
     }
 
     /**
      * @param city City name from a listing
      * @return True when the city has a value
      * @example
-     * Boolean present = DemoListingHelper.hasCity('Boston');
+     * Boolean present = ListingHelper.hasCity('Boston');
      */
     public static Boolean hasCity(String city) {
         return String.isNotBlank(city);
@@ -25,7 +25,7 @@ public with sharing class DemoListingHelper {
      * @param percent Percent below the price
      * @return Lower edge of the price band, or zero when an input is missing
      * @example
-     * Decimal floorPrice = DemoListingHelper.lowerPrice(500000, 20);
+     * Decimal floorPrice = ListingHelper.lowerPrice(500000, 20);
      */
     public static Decimal lowerPrice(Decimal price, Decimal percent) {
         if (price == null || percent == null) {
@@ -39,7 +39,7 @@ public with sharing class DemoListingHelper {
      * @param percent Percent above the price
      * @return Upper edge of the price band, or zero when an input is missing
      * @example
-     * Decimal ceilingPrice = DemoListingHelper.upperPrice(500000, 20);
+     * Decimal ceilingPrice = ListingHelper.upperPrice(500000, 20);
      */
     public static Decimal upperPrice(Decimal price, Decimal percent) {
         if (price == null || percent == null) {
@@ -50,16 +50,15 @@ public with sharing class DemoListingHelper {
 
     /**
      * @param price Listing price
-     * @param candidate Price to compare
-     * @param percent Allowed percent above and below the listing price
-     * @return True when the candidate sits inside the price band
+     * @param percent Allowed percent difference
+     * @return Distance between the upper and lower band edges, or zero when an input is missing
      * @example
-     * Boolean similar = DemoListingHelper.isWithinBand(500000, 550000, 20);
+     * Decimal spread = ListingHelper.priceSpread(500000, 20);
      */
-    public static Boolean isWithinBand(Decimal price, Decimal candidate, Decimal percent) {
-        if (price == null || candidate == null || percent == null) {
-            return false;
+    public static Decimal priceSpread(Decimal price, Decimal percent) {
+        if (price == null || percent == null) {
+            return 0;
         }
-        return candidate >= lowerPrice(price, percent) && candidate <= upperPrice(price, percent);
+        return upperPrice(price, percent) - lowerPrice(price, percent);
     }
 }
