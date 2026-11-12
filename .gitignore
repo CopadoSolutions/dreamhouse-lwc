@@ -42,11 +42,8 @@ $RECYCLE.BIN/
 
 # Local environment variables
 .env
-AGENTS.md
 .cursor
 .agentia
 .claude
 .agents
-agents.md
-agents.md
 agents.md

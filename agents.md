@@ -7,7 +7,7 @@ for deploying to the dev env metadata changes send
 
 Workflow Rules:
 
-1. when we do a new task: create the story in copado, use 'agentia cicd work create', include my default environment is: ARM Dev1
+1. when we do a new task: create the story in copado, use 'agentia cicd work create', include my default environment is: CG Dev2 (it is already set as default, nothing to do here)
 2. do the 'agentia cicd work set' to ensure the correct feature branch is ready
 3. after doing the metadata changes or data changes lets run local quality gates, with agentia cicd work test
 4. when i am done, lets do a agentia cicd work commit , and agentia cicd work push. assume the initial json result, DO NOT pull on the jobId, for the async part.
