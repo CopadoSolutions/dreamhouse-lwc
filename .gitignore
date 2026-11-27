@@ -47,5 +47,6 @@ $RECYCLE.BIN/
 .claude
 .agents
 .copado
-agents.md
+AGENTS.md
+
 skills-lock.json
